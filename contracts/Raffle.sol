@@ -16,11 +16,11 @@ contract Raffle is VRFConsumerBaseV2Plus {
 
     uint256 s_subscriptionId;
 
-    bytes32 keyHash = 0x79d3d8832d904592c0bf9818b621522c988bb8b0c05cdc3b15aea1b6e8db0c15;
+    bytes32 constant keyHash = 0x79d3d8832d904592c0bf9818b621522c988bb8b0c05cdc3b15aea1b6e8db0c15;
 
     uint32 numWords = 1;
 
-    uint32 callbackGasLimit = 100000;
+    uint32 constant callbackGasLimit = 100000;
 
     uint16 requestConfirmations = 3;
 
@@ -30,20 +30,22 @@ contract Raffle is VRFConsumerBaseV2Plus {
 
     uint counter = 0; // max 4
 
+    uint constant AUCTION_FEE = 1000000000000000;
+
     constructor(uint subscriptionId, address vrfAddress) VRFConsumerBaseV2Plus(vrfAddress) {
         s_subscriptionId = subscriptionId;
     }
 
 
     function participate() external payable returns(uint) {
-        require(msg.value >= 1000000000000000, NotEnoughMoneyToParticipate());
+        require(msg.value >= AUCTION_FEE, NotEnoughMoneyToParticipate());
         require(counter < 5, NotAvailableNow());
 
         participants[counter] = msg.sender;
 
         counter++;
         
-        payable(address(msg.sender)).transfer((msg.value - 1000000000000000));
+        payable(address(msg.sender)).transfer((msg.value - AUCTION_FEE));
 
         if(counter == 4) {
             startAuction();
